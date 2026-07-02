@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { GENRES } from "../data/games";
 import { artBg, glyphOf, showGlyph } from "../data/visuals";
@@ -38,8 +38,23 @@ export default function GameCard({
   edgeInset = 24,
 }: GameCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const dragListenersRef = useRef<{
+    move: (ev: PointerEvent) => void;
+    end: (ev: PointerEvent) => void;
+  } | null>(null);
   const isTop = stackIndex === 0;
   const genreStyle = GENRES[game.genre];
+
+  useEffect(() => {
+    return () => {
+      const listeners = dragListenersRef.current;
+      if (!listeners) return;
+      window.removeEventListener("pointermove", listeners.move);
+      window.removeEventListener("pointerup", listeners.end);
+      window.removeEventListener("pointercancel", listeners.end);
+      dragListenersRef.current = null;
+    };
+  }, []);
 
   const transform = flying
     ? offscreen(flyingDir ?? "pass")
@@ -91,6 +106,8 @@ export default function GameCard({
     const up = (ev: PointerEvent) => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+      dragListenersRef.current = null;
       const dx = ev.clientX - sx;
       const dy = ev.clientY - sy;
       let choice: Choice | null = null;
@@ -113,6 +130,8 @@ export default function GameCard({
 
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    dragListenersRef.current = { move, end: up };
   };
 
   return (
