@@ -94,12 +94,18 @@ export function useGameSwipe() {
   );
 
   const undo = useCallback(() => {
+    if (flyTimer.current) {
+      clearTimeout(flyTimer.current);
+      flyTimer.current = null;
+    }
     setState((s) => {
       if (s.index === 0) return s;
       return {
         ...s,
         index: s.index - 1,
         decisions: s.decisions.slice(0, -1),
+        flyingId: null,
+        flyingDir: null,
         screen: "swipe",
       };
     });
