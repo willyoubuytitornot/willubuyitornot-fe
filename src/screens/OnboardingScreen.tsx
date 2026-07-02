@@ -231,6 +231,7 @@ export default function OnboardingScreen({
 
       <button
         onClick={onStart}
+        disabled={!ready}
         style={{
           marginTop: 24,
           height: 56,

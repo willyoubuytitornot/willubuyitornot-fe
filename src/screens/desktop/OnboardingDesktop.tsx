@@ -241,6 +241,7 @@ export default function OnboardingDesktop({
           />
           <button
             onClick={onStart}
+            disabled={!ready}
             style={{
               marginTop: 18,
               width: "100%",
