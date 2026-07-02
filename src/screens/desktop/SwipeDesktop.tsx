@@ -11,7 +11,6 @@ interface SwipeDesktopProps {
   cardArt: CardArt;
   showAiHint: boolean;
   onDecide: (choice: Choice) => void;
-  onUndo: () => void;
 }
 
 export default function SwipeDesktop({
@@ -21,7 +20,6 @@ export default function SwipeDesktop({
   cardArt,
   showAiHint,
   onDecide,
-  onUndo,
 }: SwipeDesktopProps) {
   const total = GAMES.length;
   const visibleCards = GAMES.slice(index, index + 3);
@@ -56,7 +54,6 @@ export default function SwipeDesktop({
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
                 marginBottom: 9,
               }}
             >
@@ -66,23 +63,6 @@ export default function SwipeDesktop({
               >
                 {progressLabel}
               </span>
-              <button
-                onClick={onUndo}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                  padding: "6px 12px",
-                  borderRadius: 20,
-                  background: "rgba(255,255,255,.05)",
-                  color: "#9aa4b5",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  opacity: index === 0 ? 0.4 : 1,
-                }}
-              >
-                ↩ 되돌리기
-              </button>
             </div>
             <div
               style={{

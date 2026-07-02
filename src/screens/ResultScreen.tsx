@@ -10,7 +10,6 @@ interface ResultScreenProps {
   personaReady: boolean;
   personaStep: number;
   cardArt: CardArt;
-  onRestart: () => void;
   onOpenDetail: (game: Game) => void;
 }
 
@@ -134,7 +133,6 @@ export default function ResultScreen({
   personaReady,
   personaStep,
   cardArt,
-  onRestart,
   onOpenDetail,
 }: ResultScreenProps) {
   const summary = useMemo(() => summarize(decisions), [decisions]);
@@ -157,7 +155,6 @@ export default function ResultScreen({
         style={{
           display: "flex",
           alignItems: "flex-start",
-          justifyContent: "space-between",
           marginBottom: 20,
         }}
       >
@@ -181,21 +178,6 @@ export default function ResultScreen({
             {reportName}님의 취향 리포트가 완성됐어요
           </p>
         </div>
-        <button
-          onClick={onRestart}
-          style={{
-            marginTop: 4,
-            padding: "8px 13px",
-            borderRadius: 10,
-            background: "rgba(255,255,255,.06)",
-            color: "#c2cad6",
-            fontSize: 12,
-            fontWeight: 600,
-            whiteSpace: "nowrap",
-          }}
-        >
-          다시 시작
-        </button>
       </div>
 
       {/* AI persona hero */}
@@ -534,8 +516,6 @@ export default function ResultScreen({
           }}
         >
           좋아요한 게임이 없어요.
-          <br />
-          다시 시작해 마음에 드는 게임을 찾아보세요.
         </div>
       )}
     </div>

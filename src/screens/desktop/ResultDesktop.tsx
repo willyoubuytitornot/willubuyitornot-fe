@@ -10,7 +10,6 @@ interface ResultDesktopProps {
   personaReady: boolean;
   personaStep: number;
   cardArt: CardArt;
-  onRestart: () => void;
   onOpenDetail: (game: Game) => void;
 }
 
@@ -71,7 +70,6 @@ export default function ResultDesktop({
   personaReady,
   personaStep,
   cardArt,
-  onRestart,
   onOpenDetail,
 }: ResultDesktopProps) {
   const {
@@ -99,7 +97,6 @@ export default function ResultDesktop({
         style={{
           display: "flex",
           alignItems: "flex-end",
-          justifyContent: "space-between",
           marginBottom: 28,
         }}
       >
@@ -123,20 +120,6 @@ export default function ResultDesktop({
             {reportName}님의 취향 리포트가 완성됐어요
           </p>
         </div>
-        <button
-          onClick={onRestart}
-          style={{
-            padding: "11px 18px",
-            borderRadius: 12,
-            background: "rgba(255,255,255,.06)",
-            color: "#c2cad6",
-            fontSize: 13,
-            fontWeight: 600,
-            whiteSpace: "nowrap",
-          }}
-        >
-          ↻ 다시 시작
-        </button>
       </div>
 
       {/* persona + preference */}
@@ -477,8 +460,6 @@ export default function ResultDesktop({
           }}
         >
           좋아요한 게임이 없어요.
-          <br />
-          다시 시작해 마음에 드는 게임을 찾아보세요.
         </div>
       )}
     </div>

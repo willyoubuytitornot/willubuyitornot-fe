@@ -87,7 +87,6 @@ export default function DesktopLayout({
             cardArt={cardArt}
             showAiHint={showAiHint}
             onDecide={actions.decide}
-            onUndo={actions.undo}
           />
         </ScreenLayer>
 
@@ -102,7 +101,6 @@ export default function DesktopLayout({
             personaReady={state.personaReady}
             personaStep={state.personaStep}
             cardArt={cardArt}
-            onRestart={actions.restart}
             onOpenDetail={actions.openDetail}
           />
         </ScreenLayer>

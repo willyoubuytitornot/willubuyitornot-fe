@@ -93,24 +93,6 @@ export function useGameSwipe() {
     [commit],
   );
 
-  const undo = useCallback(() => {
-    if (flyTimer.current) {
-      clearTimeout(flyTimer.current);
-      flyTimer.current = null;
-    }
-    setState((s) => {
-      if (s.index === 0) return s;
-      return {
-        ...s,
-        index: s.index - 1,
-        decisions: s.decisions.slice(0, -1),
-        flyingId: null,
-        flyingDir: null,
-        screen: "swipe",
-      };
-    });
-  }, []);
-
   const setNickname = useCallback((nickname: string) => {
     setState((s) => ({ ...s, nickname }));
   }, []);
@@ -129,19 +111,6 @@ export function useGameSwipe() {
 
   const back = useCallback(() => {
     setState((s) => ({ ...s, screen: "result" }));
-  }, []);
-
-  const restart = useCallback(() => {
-    if (personaMsgTimer.current) clearInterval(personaMsgTimer.current);
-    if (personaDoneTimer.current) clearTimeout(personaDoneTimer.current);
-    setState((s) => ({
-      ...s,
-      index: 0,
-      decisions: [],
-      screen: "swipe",
-      personaReady: false,
-      personaStep: 0,
-    }));
   }, []);
 
   const showToast = useCallback((message: string) => {
@@ -165,12 +134,10 @@ export function useGameSwipe() {
     state,
     actions: {
       decide,
-      undo,
       setNickname,
       start,
       openDetail,
       back,
-      restart,
       showToast,
     },
   };

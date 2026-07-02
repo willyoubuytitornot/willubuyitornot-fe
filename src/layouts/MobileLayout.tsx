@@ -47,7 +47,6 @@ export default function MobileLayout({
             cardArt={cardArt}
             showAiHint={showAiHint}
             onDecide={actions.decide}
-            onUndo={actions.undo}
           />
         </ScreenLayer>
 
@@ -58,7 +57,6 @@ export default function MobileLayout({
             personaReady={state.personaReady}
             personaStep={state.personaStep}
             cardArt={cardArt}
-            onRestart={actions.restart}
             onOpenDetail={actions.openDetail}
           />
         </ScreenLayer>
