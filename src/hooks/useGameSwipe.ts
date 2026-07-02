@@ -113,6 +113,25 @@ export function useGameSwipe() {
     setState((s) => ({ ...s, screen: "result" }));
   }, []);
 
+  // Return to the first screen, resetting nickname and swipe progress.
+  const goHome = useCallback(() => {
+    if (flyTimer.current) clearTimeout(flyTimer.current);
+    if (personaMsgTimer.current) clearInterval(personaMsgTimer.current);
+    if (personaDoneTimer.current) clearTimeout(personaDoneTimer.current);
+    setState((s) => ({
+      ...s,
+      screen: "onboarding",
+      nickname: "",
+      index: 0,
+      decisions: [],
+      selected: null,
+      flyingId: null,
+      flyingDir: null,
+      personaReady: false,
+      personaStep: 0,
+    }));
+  }, []);
+
   const showToast = useCallback((message: string) => {
     setState((s) => ({ ...s, toast: message }));
     if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -138,6 +157,7 @@ export function useGameSwipe() {
       start,
       openDetail,
       back,
+      goHome,
       showToast,
     },
   };

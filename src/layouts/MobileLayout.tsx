@@ -37,6 +37,7 @@ export default function MobileLayout({
         showNick={showNick}
         reportName={reportName}
         nickInitial={nickInitial}
+        onHome={actions.goHome}
       />
 
       <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>

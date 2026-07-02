@@ -62,6 +62,7 @@ export default function DesktopLayout({
         showNick={showNick}
         reportName={reportName}
         nickInitial={nickInitial}
+        onHome={actions.goHome}
       />
 
       {/* screen area */}

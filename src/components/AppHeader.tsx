@@ -5,6 +5,8 @@ interface AppHeaderProps {
   nickInitial: string;
   /** tighter spacing/sizes for the narrow mobile layout */
   compact?: boolean;
+  /** click the logo / title to return to the first screen */
+  onHome?: () => void;
 }
 
 export default function AppHeader({
@@ -12,6 +14,7 @@ export default function AppHeader({
   reportName,
   nickInitial,
   compact = false,
+  onHome,
 }: AppHeaderProps) {
   return (
     <header
@@ -35,42 +38,57 @@ export default function AppHeader({
           minWidth: 0,
         }}
       >
-        <div
+        <button
+          type="button"
+          onClick={onHome}
+          aria-label="처음 화면으로"
           style={{
-            width: compact ? 32 : 38,
-            height: compact ? 32 : 38,
-            borderRadius: compact ? 9 : 11,
-            flexShrink: 0,
-            background: "linear-gradient(150deg, var(--ac), var(--ac2))",
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 8px 22px -8px var(--ac)",
+            gap: compact ? 10 : 13,
+            background: "none",
+            border: "none",
+            padding: 0,
+            cursor: onHome ? "pointer" : "default",
           }}
         >
-          <span
-            className="font-grotesk"
+          <div
             style={{
-              fontWeight: 700,
-              fontSize: compact ? 15 : 17,
-              color: "#0a0c11",
-              letterSpacing: "-.5px",
+              width: compact ? 32 : 38,
+              height: compact ? 32 : 38,
+              borderRadius: compact ? 9 : 11,
+              flexShrink: 0,
+              background: "linear-gradient(150deg, var(--ac), var(--ac2))",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 8px 22px -8px var(--ac)",
             }}
           >
-            GS
+            <span
+              className="font-grotesk"
+              style={{
+                fontWeight: 700,
+                fontSize: compact ? 15 : 17,
+                color: "#0a0c11",
+                letterSpacing: "-.5px",
+              }}
+            >
+              GS
+            </span>
+          </div>
+          <span
+            style={{
+              fontSize: compact ? 15 : 16,
+              fontWeight: 700,
+              color: "#eef1f6",
+              letterSpacing: "-.3px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            게임 스와이프
           </span>
-        </div>
-        <span
-          style={{
-            fontSize: compact ? 15 : 16,
-            fontWeight: 700,
-            color: "#eef1f6",
-            letterSpacing: "-.3px",
-            whiteSpace: "nowrap",
-          }}
-        >
-          게임 스와이프
-        </span>
+        </button>
         <span
           style={{
             marginLeft: compact ? 2 : 4,
