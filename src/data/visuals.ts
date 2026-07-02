@@ -14,6 +14,11 @@ export function artBg(genre: GenreKey, art: CardArt = "orbs"): string {
   return ov + base;
 }
 
+/** Per-genre artwork image served from public/assets. */
+export function artImg(genre: GenreKey): string {
+  return `${import.meta.env.BASE_URL}assets/art-${genre.toLowerCase()}.png`;
+}
+
 export function showGlyph(art: CardArt = "orbs"): boolean {
   return art === "glyph";
 }
