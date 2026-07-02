@@ -1,6 +1,7 @@
 import { GENRES, GAMES } from "../../data/games";
 import { artBg } from "../../data/visuals";
 import type { CardArt } from "../../types";
+import ArtImage from "../../components/ArtImage";
 
 interface OnboardingDesktopProps {
   nickname: string;
@@ -178,6 +179,7 @@ export default function OnboardingDesktop({
                   background: artBg(g.genre, cardArt),
                 }}
               >
+                <ArtImage genre={g.genre} />
                 <span
                   style={{
                     position: "absolute",

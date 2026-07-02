@@ -1,4 +1,5 @@
 import AiBadge from "../../components/AiBadge";
+import ArtImage from "../../components/ArtImage";
 import CommunityAnalysis from "../../components/CommunityAnalysis";
 import { enrichGame } from "../../data/gameView";
 import type { CardArt, Game } from "../../types";
@@ -66,6 +67,7 @@ export default function DetailModal({
               minHeight: 460,
             }}
           >
+            <ArtImage genre={view.genre} />
             {view.hasGlyph && (
               <span
                 className="font-grotesk"

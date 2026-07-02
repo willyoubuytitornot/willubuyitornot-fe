@@ -1,4 +1,4 @@
-import DesktopHeader from "../components/DesktopHeader";
+import AppHeader from "../components/AppHeader";
 import ScreenLayer from "../components/ScreenLayer";
 import DetailModal from "../screens/desktop/DetailModal";
 import OnboardingDesktop from "../screens/desktop/OnboardingDesktop";
@@ -58,10 +58,11 @@ export default function DesktopLayout({
         }}
       />
 
-      <DesktopHeader
+      <AppHeader
         showNick={showNick}
         reportName={reportName}
         nickInitial={nickInitial}
+        onHome={actions.goHome}
       />
 
       {/* screen area */}
@@ -87,7 +88,6 @@ export default function DesktopLayout({
             cardArt={cardArt}
             showAiHint={showAiHint}
             onDecide={actions.decide}
-            onUndo={actions.undo}
           />
         </ScreenLayer>
 
@@ -102,7 +102,6 @@ export default function DesktopLayout({
             personaReady={state.personaReady}
             personaStep={state.personaStep}
             cardArt={cardArt}
-            onRestart={actions.restart}
             onOpenDetail={actions.openDetail}
           />
         </ScreenLayer>

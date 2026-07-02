@@ -3,6 +3,7 @@ import type { PointerEvent as ReactPointerEvent } from "react";
 import { GENRES } from "../data/games";
 import { artBg, glyphOf, showGlyph } from "../data/visuals";
 import type { CardArt, Choice, Game } from "../types";
+import ArtImage from "./ArtImage";
 
 const DRAG_THRESHOLD = 100;
 
@@ -168,6 +169,7 @@ export default function GameCard({
           background: artBg(game.genre, cardArt),
         }}
       >
+        <ArtImage genre={game.genre} />
         {showGlyph(cardArt) && (
           <span
             className="font-grotesk"

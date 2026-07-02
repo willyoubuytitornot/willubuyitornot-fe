@@ -1,6 +1,7 @@
 import { GENRES } from "../data/games";
 import { artBg, glyphOf, sentColor, showGlyph } from "../data/visuals";
 import type { CardArt, Game } from "../types";
+import ArtImage from "../components/ArtImage";
 
 interface DetailScreenProps {
   game: Game | null;
@@ -31,6 +32,7 @@ export default function DetailScreen({
           background: artBg(game.genre, cardArt),
         }}
       >
+        <ArtImage genre={game.genre} />
         {showGlyph(cardArt) && (
           <span
             className="font-grotesk"
