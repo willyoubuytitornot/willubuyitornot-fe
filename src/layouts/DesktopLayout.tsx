@@ -1,4 +1,4 @@
-import DesktopHeader from "../components/DesktopHeader";
+import AppHeader from "../components/AppHeader";
 import ScreenLayer from "../components/ScreenLayer";
 import DetailModal from "../screens/desktop/DetailModal";
 import OnboardingDesktop from "../screens/desktop/OnboardingDesktop";
@@ -58,7 +58,7 @@ export default function DesktopLayout({
         }}
       />
 
-      <DesktopHeader
+      <AppHeader
         showNick={showNick}
         reportName={reportName}
         nickInitial={nickInitial}

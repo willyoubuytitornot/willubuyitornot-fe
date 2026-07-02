@@ -1,3 +1,4 @@
+import AppHeader from "../components/AppHeader";
 import ScreenLayer from "../components/ScreenLayer";
 import Toast from "../components/Toast";
 import DetailScreen from "../screens/DetailScreen";
@@ -13,6 +14,11 @@ export default function MobileLayout({
   cardArt,
   showAiHint,
 }: LayoutProps) {
+  const trimmed = state.nickname.trim();
+  const reportName = state.nickname || "게이머";
+  const nickInitial = (trimmed[0] || "G").toUpperCase();
+  const showNick = !!trimmed && state.screen !== "onboarding";
+
   return (
     <div
       style={{
@@ -26,6 +32,13 @@ export default function MobileLayout({
         flexDirection: "column",
       }}
     >
+      <AppHeader
+        compact
+        showNick={showNick}
+        reportName={reportName}
+        nickInitial={nickInitial}
+      />
+
       <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
         <ScreenLayer
           active={state.screen === "onboarding"}
