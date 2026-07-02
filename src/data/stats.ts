@@ -11,6 +11,8 @@ export interface GenreStat {
 
 export interface SwipeSummary {
   liked: Game[];
+  maybe: Game[];
+  passed: Game[];
   likeCount: number;
   maybeCount: number;
   passCount: number;
@@ -19,16 +21,23 @@ export interface SwipeSummary {
   persona: Persona;
 }
 
-/** Aggregate swipe decisions into the result-screen analytics. */
-export function summarize(decisions: Decision[]): SwipeSummary {
-  const liked = decisions
-    .filter((d) => d.choice === "like")
+/** Games swiped with a given choice, in swipe order. */
+function gamesByChoice(decisions: Decision[], choice: Decision["choice"]): Game[] {
+  return decisions
+    .filter((d) => d.choice === choice)
     .map((d) => getGameById(d.id))
     .filter((g): g is Game => Boolean(g));
+}
+
+/** Aggregate swipe decisions into the result-screen analytics. */
+export function summarize(decisions: Decision[]): SwipeSummary {
+  const liked = gamesByChoice(decisions, "like");
+  const maybe = gamesByChoice(decisions, "maybe");
+  const passed = gamesByChoice(decisions, "pass");
 
   const likeCount = liked.length;
-  const maybeCount = decisions.filter((d) => d.choice === "maybe").length;
-  const passCount = decisions.filter((d) => d.choice === "pass").length;
+  const maybeCount = maybe.length;
+  const passCount = passed.length;
 
   // Prefer liked games for genre profiling; fall back to everything swiped.
   const pool = liked.length
@@ -56,6 +65,8 @@ export function summarize(decisions: Decision[]): SwipeSummary {
 
   return {
     liked,
+    maybe,
+    passed,
     likeCount,
     maybeCount,
     passCount,

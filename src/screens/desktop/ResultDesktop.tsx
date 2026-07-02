@@ -3,6 +3,7 @@ import { GENRES, PERSONA_MSGS } from "../../data/games";
 import { summarize } from "../../data/stats";
 import { artBg } from "../../data/visuals";
 import type { CardArt, Decision, Game } from "../../types";
+import ArtImage from "../../components/ArtImage";
 
 interface ResultDesktopProps {
   decisions: Decision[];
@@ -64,6 +65,104 @@ function PersonaLoadingDesktop({ message }: { message: string }) {
   );
 }
 
+function ResultCardDesktop({
+  game,
+  cardArt,
+  onOpenDetail,
+}: {
+  game: Game;
+  cardArt: CardArt;
+  onOpenDetail: (game: Game) => void;
+}) {
+  return (
+    <button
+      onClick={() => onOpenDetail(game)}
+      style={{
+        textAlign: "left",
+        borderRadius: 16,
+        overflow: "hidden",
+        background: "#14171f",
+        border: "1px solid rgba(255,255,255,.07)",
+        transition: "transform .12s, border-color .12s",
+      }}
+      onPointerDown={(e) => {
+        e.currentTarget.style.transform = "scale(.97)";
+      }}
+      onPointerUp={(e) => {
+        e.currentTarget.style.transform = "none";
+      }}
+      onPointerEnter={(e) => {
+        e.currentTarget.style.borderColor = "rgba(255,255,255,.18)";
+      }}
+      onPointerLeave={(e) => {
+        e.currentTarget.style.transform = "none";
+        e.currentTarget.style.borderColor = "rgba(255,255,255,.07)";
+      }}
+    >
+      <div
+        style={{
+          height: 120,
+          position: "relative",
+          overflow: "hidden",
+          background: artBg(game.genre, cardArt),
+        }}
+      >
+        <ArtImage genre={game.genre} />
+        <span
+          style={{
+            position: "absolute",
+            top: 8,
+            left: 8,
+            padding: "3px 8px",
+            borderRadius: 6,
+            background: "rgba(10,12,17,.5)",
+            fontSize: 10,
+            fontWeight: 700,
+            color: GENRES[game.genre].tag,
+          }}
+        >
+          {game.genre}
+        </span>
+      </div>
+      <div style={{ padding: "12px 13px 14px" }}>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: "#eef1f6",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {game.title}
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: 5,
+          }}
+        >
+          <span
+            className="font-grotesk"
+            style={{ fontSize: 12, color: "#79828f" }}
+          >
+            {game.year}
+          </span>
+          <span
+            className="font-grotesk"
+            style={{ fontSize: 12, color: "#ffd25e" }}
+          >
+            ★ {game.rating.toFixed(1)}
+          </span>
+        </div>
+      </div>
+    </button>
+  );
+}
+
 export default function ResultDesktop({
   decisions,
   nickname,
@@ -74,6 +173,8 @@ export default function ResultDesktop({
 }: ResultDesktopProps) {
   const {
     liked,
+    maybe,
+    passed,
     likeCount,
     maybeCount,
     passCount,
@@ -83,6 +184,11 @@ export default function ResultDesktop({
   } = useMemo(() => summarize(decisions), [decisions]);
   const reportName = nickname || "게이머";
   const personaMsg = PERSONA_MSGS[personaStep] ?? PERSONA_MSGS[0];
+  const sections = [
+    { key: "like", label: "좋아요한 게임", color: "var(--ac)", games: liked },
+    { key: "maybe", label: "고민중인 게임", color: "#f5c441", games: maybe },
+    { key: "pass", label: "패스한 게임", color: "#ff5a76", games: passed },
+  ].filter((s) => s.games.length > 0);
 
   const stats = [
     { value: likeCount, label: "좋아요", color: "#3fe08a", bg: "rgba(63,224,138,.1)" },
@@ -332,122 +438,50 @@ export default function ResultDesktop({
         </div>
       </div>
 
-      {/* liked grid */}
-      {likeCount > 0 ? (
-        <>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              margin: "8px 0 16px",
-            }}
-          >
-            <span style={{ fontSize: 18, fontWeight: 700, color: "#eef1f6" }}>
-              좋아요한 게임
-            </span>
-            <span
-              className="font-grotesk"
-              style={{ fontSize: 15, fontWeight: 600, color: "var(--ac)" }}
-            >
-              {likeCount}
-            </span>
-          </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: 16,
-            }}
-          >
-            {liked.map((game) => (
-              <button
-                key={game.id}
-                onClick={() => onOpenDetail(game)}
+      {/* game lists by decision */}
+      {sections.length > 0 ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 30 }}>
+          {sections.map((section) => (
+            <div key={section.key}>
+              <div
                 style={{
-                  textAlign: "left",
-                  borderRadius: 16,
-                  overflow: "hidden",
-                  background: "#14171f",
-                  border: "1px solid rgba(255,255,255,.07)",
-                  transition: "transform .12s, border-color .12s",
-                }}
-                onPointerDown={(e) => {
-                  e.currentTarget.style.transform = "scale(.97)";
-                }}
-                onPointerUp={(e) => {
-                  e.currentTarget.style.transform = "none";
-                }}
-                onPointerEnter={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,.18)";
-                }}
-                onPointerLeave={(e) => {
-                  e.currentTarget.style.transform = "none";
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,.07)";
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  margin: "0 0 16px",
                 }}
               >
-                <div
-                  style={{
-                    height: 120,
-                    position: "relative",
-                    background: artBg(game.genre, cardArt),
-                  }}
+                <span
+                  style={{ fontSize: 18, fontWeight: 700, color: "#eef1f6" }}
                 >
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: 8,
-                      left: 8,
-                      padding: "3px 8px",
-                      borderRadius: 6,
-                      background: "rgba(10,12,17,.5)",
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: GENRES[game.genre].tag,
-                    }}
-                  >
-                    {game.genre}
-                  </span>
-                </div>
-                <div style={{ padding: "12px 13px 14px" }}>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: "#eef1f6",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    {game.title}
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginTop: 5,
-                    }}
-                  >
-                    <span
-                      className="font-grotesk"
-                      style={{ fontSize: 12, color: "#79828f" }}
-                    >
-                      {game.year}
-                    </span>
-                    <span
-                      className="font-grotesk"
-                      style={{ fontSize: 12, color: "#ffd25e" }}
-                    >
-                      ★ {game.rating.toFixed(1)}
-                    </span>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </>
+                  {section.label}
+                </span>
+                <span
+                  className="font-grotesk"
+                  style={{ fontSize: 15, fontWeight: 600, color: section.color }}
+                >
+                  {section.games.length}
+                </span>
+              </div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, 1fr)",
+                  gap: 16,
+                }}
+              >
+                {section.games.map((game) => (
+                  <ResultCardDesktop
+                    key={game.id}
+                    game={game}
+                    cardArt={cardArt}
+                    onOpenDetail={onOpenDetail}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div
           style={{
@@ -459,7 +493,7 @@ export default function ResultDesktop({
             fontSize: 14,
           }}
         >
-          좋아요한 게임이 없어요.
+          스와이프한 게임이 없어요.
         </div>
       )}
     </div>
