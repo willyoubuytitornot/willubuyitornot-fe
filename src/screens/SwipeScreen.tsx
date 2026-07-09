@@ -1,9 +1,9 @@
 import GameCard from "../components/GameCard";
 import SwipeControls from "../components/SwipeControls";
-import { GAMES } from "../data/games";
-import type { CardArt, Choice } from "../types";
+import type { CardArt, Choice, Game } from "../types";
 
 interface SwipeScreenProps {
+  deck: Game[];
   index: number;
   flyingId: string | null;
   flyingDir: Choice | null;
@@ -13,6 +13,7 @@ interface SwipeScreenProps {
 }
 
 export default function SwipeScreen({
+  deck,
   index,
   flyingId,
   flyingDir,
@@ -20,8 +21,8 @@ export default function SwipeScreen({
   showAiHint,
   onDecide,
 }: SwipeScreenProps) {
-  const total = GAMES.length;
-  const visibleCards = GAMES.slice(index, index + 3);
+  const total = deck.length;
+  const visibleCards = deck.slice(index, index + 3);
   const progressLabel = `${Math.min(index + 1, total)} / ${total}`;
   const progressPct = `${Math.round((index / total) * 100)}%`;
 

@@ -1,18 +1,23 @@
 import { GENRES } from "../data/games";
 import { artBg, glyphOf, sentColor, showGlyph } from "../data/visuals";
-import type { CardArt, Game } from "../types";
+import type { CardArt, Game, GameInsight } from "../types";
 import ArtImage from "../components/ArtImage";
+import InsightLoading from "../components/InsightLoading";
 
 interface DetailScreenProps {
   game: Game | null;
+  insight: GameInsight | null;
+  loading: boolean;
   cardArt: CardArt;
   onBack: () => void;
-  onStore: () => void;
-  onCommunity: () => void;
+  onStore: (url?: string) => void;
+  onCommunity: (url?: string) => void;
 }
 
 export default function DetailScreen({
   game,
+  insight,
+  loading,
   cardArt,
   onBack,
   onStore,
@@ -20,7 +25,7 @@ export default function DetailScreen({
 }: DetailScreenProps) {
   if (!game) return null;
   const genreStyle = GENRES[game.genre];
-  const negative = 100 - game.positive;
+  const negative = insight ? 100 - insight.positive : 0;
 
   return (
     <div style={{ paddingBottom: 34 }}>
@@ -32,7 +37,7 @@ export default function DetailScreen({
           background: artBg(game.genre, cardArt),
         }}
       >
-        <ArtImage genre={game.genre} />
+        <ArtImage genre={game.genre} src={game.imageUrl} />
         {showGlyph(cardArt) && (
           <span
             className="font-grotesk"
@@ -107,20 +112,22 @@ export default function DetailScreen({
             >
               {game.year}
             </span>
-            <span
-              className="font-grotesk"
-              style={{
-                padding: "5px 11px",
-                borderRadius: 8,
-                background: "rgba(10,12,17,.55)",
-                backdropFilter: "blur(6px)",
-                fontSize: 11,
-                fontWeight: 600,
-                color: "#ffd25e",
-              }}
-            >
-              ★ {game.rating.toFixed(1)}
-            </span>
+            {insight && (
+              <span
+                className="font-grotesk"
+                style={{
+                  padding: "5px 11px",
+                  borderRadius: 8,
+                  background: "rgba(10,12,17,.55)",
+                  backdropFilter: "blur(6px)",
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: "#ffd25e",
+                }}
+              >
+                ★ {insight.rating.toFixed(1)}
+              </span>
+            )}
           </div>
           <h1
             style={{
@@ -137,89 +144,97 @@ export default function DetailScreen({
       </div>
 
       <div style={{ padding: "18px 22px 0" }}>
-        <p
-          style={{
-            margin: "0 0 18px",
-            fontSize: 14,
-            color: "#aab3c1",
-            lineHeight: 1.5,
-          }}
-        >
-          {game.desc}
-        </p>
+        {game.desc && (
+          <p
+            style={{
+              margin: "0 0 18px",
+              fontSize: 14,
+              color: "#aab3c1",
+              lineHeight: 1.5,
+            }}
+          >
+            {game.desc}
+          </p>
+        )}
 
         {/* AI community summary */}
-        <div
-          style={{
-            position: "relative",
-            borderRadius: 20,
-            padding: 1.5,
-            background:
-              "linear-gradient(120deg, var(--ac), var(--aig), var(--ac))",
-            backgroundSize: "300% 100%",
-            animation: "gs-shimmer 6s linear infinite",
-            boxShadow: "0 0 40px -16px var(--aig)",
-          }}
-        >
+        {(insight || loading) && (
           <div
             style={{
-              borderRadius: 19,
-              background: "linear-gradient(160deg, #161b26, #11131a)",
-              padding: 19,
+              position: "relative",
+              borderRadius: 20,
+              padding: 1.5,
+              background:
+                "linear-gradient(120deg, var(--ac), var(--aig), var(--ac))",
+              backgroundSize: "300% 100%",
+              animation: "gs-shimmer 6s linear infinite",
+              boxShadow: "0 0 40px -16px var(--aig)",
             }}
           >
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 7,
-                marginBottom: 13,
+                borderRadius: 19,
+                background: "linear-gradient(160deg, #161b26, #11131a)",
+                padding: 19,
               }}
             >
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 5,
-                  padding: "4px 11px",
-                  borderRadius: 8,
-                  background: "linear-gradient(135deg, var(--ac), var(--aig))",
-                  color: "#0a0c11",
-                  fontSize: 11,
-                  fontWeight: 800,
-                  letterSpacing: ".5px",
-                }}
-              >
-                <span
+              {!insight ? (
+                <InsightLoading />
+              ) : (
+                <>
+                <div
                   style={{
-                    animation: "gs-spark 3s ease-in-out infinite",
-                    display: "inline-block",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 7,
+                    marginBottom: 13,
                   }}
                 >
-                  ✦
-                </span>{" "}
-                AI 커뮤니티 요약
-              </span>
-              <span
-                className="font-grotesk"
-                style={{ fontSize: 11, color: "#6b7280" }}
-              >
-                리뷰 {game.reviews.toLocaleString()}개 기반
-              </span>
-            </div>
-            <p
-              style={{
-                margin: "0 0 17px",
-                fontSize: 14,
-                color: "#dfe6ee",
-                lineHeight: 1.55,
-                fontWeight: 500,
-              }}
-            >
-              {game.summary}
-            </p>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      padding: "4px 11px",
+                      borderRadius: 8,
+                      background:
+                        "linear-gradient(135deg, var(--ac), var(--aig))",
+                      color: "#0a0c11",
+                      fontSize: 11,
+                      fontWeight: 800,
+                      letterSpacing: ".5px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        animation: "gs-spark 3s ease-in-out infinite",
+                        display: "inline-block",
+                      }}
+                    >
+                      ✦
+                    </span>{" "}
+                    AI 커뮤니티 요약
+                  </span>
+                  <span
+                    className="font-grotesk"
+                    style={{ fontSize: 11, color: "#6b7280" }}
+                  >
+                    리뷰 {insight.reviews.toLocaleString()}개 기반
+                  </span>
+                </div>
+                <p
+                  style={{
+                    margin: "0 0 17px",
+                    fontSize: 14,
+                    color: "#dfe6ee",
+                    lineHeight: 1.55,
+                    fontWeight: 500,
+                  }}
+                >
+                  {insight.summary}
+                </p>
 
-            {/* like / dislike split */}
+                {/* like / dislike split */}
             <div
               style={{
                 display: "flex",
@@ -231,7 +246,7 @@ export default function DetailScreen({
               <span
                 style={{ fontSize: 12, fontWeight: 600, color: "#3fe08a" }}
               >
-                긍정 {game.positive}%
+                긍정 {insight.positive}%
               </span>
               <span
                 style={{ fontSize: 12, fontWeight: 600, color: "#ff7a93" }}
@@ -250,7 +265,7 @@ export default function DetailScreen({
             >
               <div
                 style={{
-                  width: `${game.positive}%`,
+                  width: `${insight.positive}%`,
                   background: "linear-gradient(90deg, #2fbf72, #3fe08a)",
                   borderRadius: "5px 0 0 5px",
                 }}
@@ -266,7 +281,7 @@ export default function DetailScreen({
                 marginTop: 18,
               }}
             >
-              {game.sentiments.map((sv) => {
+              {insight.sentiments.map((sv) => {
                 const color = sentColor(sv.pct);
                 return (
                   <div key={sv.label}>
@@ -321,7 +336,7 @@ export default function DetailScreen({
                 marginTop: 17,
               }}
             >
-              {game.pros.map((p) => (
+              {insight.pros.map((p) => (
                 <span
                   key={p}
                   style={{
@@ -337,7 +352,7 @@ export default function DetailScreen({
                   + {p}
                 </span>
               ))}
-              {game.cons.map((c) => (
+              {insight.cons.map((c) => (
                 <span
                   key={c}
                   style={{
@@ -354,13 +369,16 @@ export default function DetailScreen({
                 </span>
               ))}
             </div>
+              </>
+            )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* actions */}
         <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
           <button
-            onClick={onStore}
+            onClick={() => onStore(game.storeUrl)}
             style={{
               flex: 1.4,
               height: 54,
@@ -379,7 +397,7 @@ export default function DetailScreen({
             스토어에서 보기
           </button>
           <button
-            onClick={onCommunity}
+            onClick={() => onCommunity(game.communityUrl)}
             style={{
               flex: 1,
               height: 54,

@@ -1,12 +1,12 @@
-import { useMemo } from "react";
 import { GENRES, PERSONA_MSGS } from "../../data/games";
-import { summarize } from "../../data/stats";
+import type { ResultData } from "../../data/stats";
 import { artBg } from "../../data/visuals";
-import type { CardArt, Decision, Game } from "../../types";
+import type { CardArt, Game } from "../../types";
 import ArtImage from "../../components/ArtImage";
 
 interface ResultDesktopProps {
-  decisions: Decision[];
+  result: ResultData | null;
+  totalCount: number;
   nickname: string;
   personaReady: boolean;
   personaStep: number;
@@ -107,7 +107,7 @@ function ResultCardDesktop({
           background: artBg(game.genre, cardArt),
         }}
       >
-        <ArtImage genre={game.genre} />
+        <ArtImage genre={game.genre} src={game.imageUrl} />
         <span
           style={{
             position: "absolute",
@@ -151,12 +151,6 @@ function ResultCardDesktop({
           >
             {game.year}
           </span>
-          <span
-            className="font-grotesk"
-            style={{ fontSize: 12, color: "#ffd25e" }}
-          >
-            ★ {game.rating.toFixed(1)}
-          </span>
         </div>
       </div>
     </button>
@@ -164,37 +158,31 @@ function ResultCardDesktop({
 }
 
 export default function ResultDesktop({
-  decisions,
+  result,
+  totalCount,
   nickname,
   personaReady,
   personaStep,
   cardArt,
   onOpenDetail,
 }: ResultDesktopProps) {
-  const {
-    liked,
-    maybe,
-    passed,
-    likeCount,
-    maybeCount,
-    passCount,
-    totalCount,
-    genreStats,
-    persona,
-  } = useMemo(() => summarize(decisions), [decisions]);
   const reportName = nickname || "게이머";
   const personaMsg = PERSONA_MSGS[personaStep] ?? PERSONA_MSGS[0];
-  const sections = [
-    { key: "like", label: "좋아요한 게임", color: "var(--ac)", games: liked },
-    { key: "maybe", label: "고민중인 게임", color: "#f5c441", games: maybe },
-    { key: "pass", label: "패스한 게임", color: "#ff5a76", games: passed },
-  ].filter((s) => s.games.length > 0);
+  const sections = result
+    ? [
+        { key: "like", label: "좋아요한 게임", color: "var(--ac)", games: result.liked },
+        { key: "maybe", label: "고민중인 게임", color: "#f5c441", games: result.maybe },
+        { key: "pass", label: "패스한 게임", color: "#ff5a76", games: result.passed },
+      ].filter((s) => s.games.length > 0)
+    : [];
 
-  const stats = [
-    { value: likeCount, label: "좋아요", color: "#3fe08a", bg: "rgba(63,224,138,.1)" },
-    { value: maybeCount, label: "고민중", color: "#f5c441", bg: "rgba(245,196,65,.1)" },
-    { value: passCount, label: "패스", color: "#ff5a76", bg: "rgba(255,90,118,.1)" },
-  ];
+  const stats = result
+    ? [
+        { value: result.likeCount, label: "좋아요", color: "#3fe08a", bg: "rgba(63,224,138,.1)" },
+        { value: result.maybeCount, label: "고민중", color: "#f5c441", bg: "rgba(245,196,65,.1)" },
+        { value: result.passCount, label: "패스", color: "#ff5a76", bg: "rgba(255,90,118,.1)" },
+      ]
+    : [];
 
   return (
     <div style={{ maxWidth: 1180, margin: "0 auto", padding: "40px 48px 72px" }}>
@@ -295,7 +283,7 @@ export default function ResultDesktop({
               </span>
             </div>
 
-            {!personaReady ? (
+            {!result || !personaReady ? (
               <PersonaLoadingDesktop message={personaMsg} />
             ) : (
               <div style={{ animation: "gs-reveal .5s cubic-bezier(.2,.8,.2,1)" }}>
@@ -309,7 +297,7 @@ export default function ResultDesktop({
                     lineHeight: 1.18,
                   }}
                 >
-                  {persona.title}
+                  {result.persona.title}
                 </h2>
                 <p
                   style={{
@@ -319,7 +307,7 @@ export default function ResultDesktop({
                     lineHeight: 1.6,
                   }}
                 >
-                  {persona.desc}
+                  {result.persona.desc}
                 </p>
                 <div
                   style={{
@@ -329,7 +317,7 @@ export default function ResultDesktop({
                     marginTop: 20,
                   }}
                 >
-                  {persona.tags.map((tag) => (
+                  {result.persona.tags.map((tag) => (
                     <span
                       key={tag}
                       style={{
@@ -369,7 +357,7 @@ export default function ResultDesktop({
             좋아요한 게임의 장르 비율이에요
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {genreStats.map((gs) => (
+            {(result?.genreStats ?? []).map((gs) => (
               <div key={gs.name}>
                 <div
                   style={{
@@ -482,7 +470,7 @@ export default function ResultDesktop({
             </div>
           ))}
         </div>
-      ) : (
+      ) : result ? (
         <div
           style={{
             textAlign: "center",
@@ -495,7 +483,7 @@ export default function ResultDesktop({
         >
           스와이프한 게임이 없어요.
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

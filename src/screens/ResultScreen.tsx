@@ -1,12 +1,12 @@
-import { useMemo } from "react";
 import { GENRES, PERSONA_MSGS } from "../data/games";
-import { summarize } from "../data/stats";
+import type { ResultData } from "../data/stats";
 import { artBg } from "../data/visuals";
-import type { CardArt, Decision, Game } from "../types";
+import type { CardArt, Game } from "../types";
 import ArtImage from "../components/ArtImage";
 
 interface ResultScreenProps {
-  decisions: Decision[];
+  result: ResultData | null;
+  totalCount: number;
   nickname: string;
   personaReady: boolean;
   personaStep: number;
@@ -166,7 +166,7 @@ function ResultCard({
           background: artBg(game.genre, cardArt),
         }}
       >
-        <ArtImage genre={game.genre} />
+        <ArtImage genre={game.genre} src={game.imageUrl} />
         <span
           style={{
             position: "absolute",
@@ -210,12 +210,6 @@ function ResultCard({
           >
             {game.year}
           </span>
-          <span
-            className="font-grotesk"
-            style={{ fontSize: 11.5, color: "#ffd25e" }}
-          >
-            ★ {game.rating.toFixed(1)}
-          </span>
         </div>
       </div>
     </button>
@@ -223,32 +217,23 @@ function ResultCard({
 }
 
 export default function ResultScreen({
-  decisions,
+  result,
+  totalCount,
   nickname,
   personaReady,
   personaStep,
   cardArt,
   onOpenDetail,
 }: ResultScreenProps) {
-  const summary = useMemo(() => summarize(decisions), [decisions]);
-  const {
-    liked,
-    maybe,
-    passed,
-    likeCount,
-    maybeCount,
-    passCount,
-    totalCount,
-    genreStats,
-    persona,
-  } = summary;
   const reportName = nickname || "게이머";
   const personaMsg = PERSONA_MSGS[personaStep] ?? PERSONA_MSGS[0];
-  const sections = [
-    { key: "like", label: "좋아요한 게임", color: "var(--ac)", games: liked },
-    { key: "maybe", label: "고민중인 게임", color: "#f5c441", games: maybe },
-    { key: "pass", label: "패스한 게임", color: "#ff5a76", games: passed },
-  ].filter((s) => s.games.length > 0);
+  const sections = result
+    ? [
+        { key: "like", label: "좋아요한 게임", color: "var(--ac)", games: result.liked },
+        { key: "maybe", label: "고민중인 게임", color: "#f5c441", games: result.maybe },
+        { key: "pass", label: "패스한 게임", color: "#ff5a76", games: result.passed },
+      ].filter((s) => s.games.length > 0)
+    : [];
 
   return (
     <div style={{ padding: "8px 22px 40px" }}>
@@ -340,7 +325,7 @@ export default function ResultScreen({
             </span>
           </div>
 
-          {!personaReady ? (
+          {!result || !personaReady ? (
             <PersonaLoading message={personaMsg} />
           ) : (
             <div style={{ animation: "gs-reveal .5s cubic-bezier(.2,.8,.2,1)" }}>
@@ -354,7 +339,7 @@ export default function ResultScreen({
                   lineHeight: 1.2,
                 }}
               >
-                {persona.title}
+                {result.persona.title}
               </h2>
               <p
                 style={{
@@ -364,7 +349,7 @@ export default function ResultScreen({
                   lineHeight: 1.55,
                 }}
               >
-                {persona.desc}
+                {result.persona.desc}
               </p>
               <div
                 style={{
@@ -374,7 +359,7 @@ export default function ResultScreen({
                   marginTop: 16,
                 }}
               >
-                {persona.tags.map((tag) => (
+                {result.persona.tags.map((tag) => (
                   <span
                     key={tag}
                     style={{
@@ -397,6 +382,7 @@ export default function ResultScreen({
       </div>
 
       {/* preference analysis */}
+      {result && (
       <div
         style={{
           background: "#14171f",
@@ -420,7 +406,7 @@ export default function ResultScreen({
           좋아요한 게임의 장르 비율이에요
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-          {genreStats.map((gs) => (
+          {result.genreStats.map((gs) => (
             <div key={gs.name}>
               <div
                 style={{
@@ -466,9 +452,9 @@ export default function ResultScreen({
         </div>
         <div style={{ display: "flex", gap: 8, marginTop: 18 }}>
           {[
-            { value: likeCount, label: "좋아요", color: "#3fe08a", bg: "rgba(63,224,138,.1)" },
-            { value: maybeCount, label: "고민중", color: "#f5c441", bg: "rgba(245,196,65,.1)" },
-            { value: passCount, label: "패스", color: "#ff5a76", bg: "rgba(255,90,118,.1)" },
+            { value: result.likeCount, label: "좋아요", color: "#3fe08a", bg: "rgba(63,224,138,.1)" },
+            { value: result.maybeCount, label: "고민중", color: "#f5c441", bg: "rgba(245,196,65,.1)" },
+            { value: result.passCount, label: "패스", color: "#ff5a76", bg: "rgba(255,90,118,.1)" },
           ].map((stat) => (
             <div
               key={stat.label}
@@ -493,6 +479,7 @@ export default function ResultScreen({
           ))}
         </div>
       </div>
+      )}
 
       {/* game lists by decision */}
       {sections.length > 0 ? (
@@ -538,7 +525,7 @@ export default function ResultScreen({
             </div>
           ))}
         </div>
-      ) : (
+      ) : result ? (
         <div
           style={{
             textAlign: "center",
@@ -551,7 +538,7 @@ export default function ResultScreen({
         >
           스와이프한 게임이 없어요.
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

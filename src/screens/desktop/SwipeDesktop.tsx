@@ -1,10 +1,10 @@
 import GameCard from "../../components/GameCard";
 import GameInfoPanel from "../../components/GameInfoPanel";
 import SwipeControls from "../../components/SwipeControls";
-import { GAMES } from "../../data/games";
-import type { CardArt, Choice } from "../../types";
+import type { CardArt, Choice, Game } from "../../types";
 
 interface SwipeDesktopProps {
+  deck: Game[];
   index: number;
   flyingId: string | null;
   flyingDir: Choice | null;
@@ -14,6 +14,7 @@ interface SwipeDesktopProps {
 }
 
 export default function SwipeDesktop({
+  deck,
   index,
   flyingId,
   flyingDir,
@@ -21,9 +22,9 @@ export default function SwipeDesktop({
   showAiHint,
   onDecide,
 }: SwipeDesktopProps) {
-  const total = GAMES.length;
-  const visibleCards = GAMES.slice(index, index + 3);
-  const topGame = GAMES[index];
+  const total = deck.length;
+  const visibleCards = deck.slice(index, index + 3);
+  const topGame = deck[index];
   const progressLabel = `${Math.min(index + 1, total)} / ${total}`;
   const progressPct = `${Math.round((index / total) * 100)}%`;
 
@@ -112,7 +113,7 @@ export default function SwipeDesktop({
             justifyContent: "center",
           }}
         >
-          {topGame && <GameInfoPanel game={topGame} cardArt={cardArt} />}
+          {topGame && <GameInfoPanel game={topGame} />}
         </div>
       </div>
     </div>

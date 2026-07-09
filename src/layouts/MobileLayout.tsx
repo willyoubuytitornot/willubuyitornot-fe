@@ -48,6 +48,7 @@ export default function MobileLayout({
         >
           <OnboardingScreen
             nickname={state.nickname}
+            starting={state.starting}
             onNickname={actions.setNickname}
             onStart={actions.start}
           />
@@ -55,6 +56,7 @@ export default function MobileLayout({
 
         <ScreenLayer active={state.screen === "swipe"} label="스와이프">
           <SwipeScreen
+            deck={state.deck}
             index={state.index}
             flyingId={state.flyingId}
             flyingDir={state.flyingDir}
@@ -66,7 +68,8 @@ export default function MobileLayout({
 
         <ScreenLayer active={state.screen === "result"} label="결과" scroll>
           <ResultScreen
-            decisions={state.decisions}
+            result={state.result}
+            totalCount={state.decisions.length}
             nickname={state.nickname}
             personaReady={state.personaReady}
             personaStep={state.personaStep}
@@ -83,10 +86,20 @@ export default function MobileLayout({
         >
           <DetailScreen
             game={state.selected}
+            insight={state.insight}
+            loading={state.loadingDetail}
             cardArt={cardArt}
             onBack={actions.back}
-            onStore={() => actions.showToast("STOVE 스토어로 이동합니다")}
-            onCommunity={() => actions.showToast("커뮤니티로 이동합니다")}
+            onStore={(url) =>
+              url
+                ? window.open(url, "_blank", "noopener,noreferrer")
+                : actions.showToast("스토어 링크가 없어요")
+            }
+            onCommunity={(url) =>
+              url
+                ? window.open(url, "_blank", "noopener,noreferrer")
+                : actions.showToast("커뮤니티 링크가 없어요")
+            }
           />
         </ScreenLayer>
       </div>

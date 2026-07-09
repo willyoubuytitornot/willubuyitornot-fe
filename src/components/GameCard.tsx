@@ -169,7 +169,7 @@ export default function GameCard({
           background: artBg(game.genre, cardArt),
         }}
       >
-        <ArtImage genre={game.genre} />
+        <ArtImage genre={game.genre} src={game.imageUrl} />
         {showGlyph(cardArt) && (
           <span
             className="font-grotesk"
@@ -233,24 +233,6 @@ export default function GameCard({
             {game.year}
           </span>
         </div>
-        <div
-          className="font-grotesk"
-          style={{
-            position: "absolute",
-            top: 14,
-            right: 14,
-            padding: "5px 10px",
-            borderRadius: 8,
-            background: "rgba(10,12,17,.5)",
-            backdropFilter: "blur(6px)",
-            fontSize: 12,
-            fontWeight: 600,
-            color: "#ffd25e",
-          }}
-        >
-          ★ {game.rating.toFixed(1)}
-        </div>
-
         {/* drag badges (top card only) */}
         {isTop && (
           <>
@@ -335,16 +317,18 @@ export default function GameCard({
         >
           {game.title}
         </h2>
-        <p
-          style={{
-            margin: "7px 0 0",
-            fontSize: 13.5,
-            color: "#98a2b3",
-            lineHeight: 1.45,
-          }}
-        >
-          {game.desc}
-        </p>
+        {game.desc && (
+          <p
+            style={{
+              margin: "7px 0 0",
+              fontSize: 13.5,
+              color: "#98a2b3",
+              lineHeight: 1.45,
+            }}
+          >
+            {game.desc}
+          </p>
+        )}
         {showAi && (
           <div
             style={{

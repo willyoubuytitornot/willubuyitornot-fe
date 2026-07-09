@@ -1,5 +1,6 @@
 interface OnboardingScreenProps {
   nickname: string;
+  starting: boolean;
   onNickname: (value: string) => void;
   onStart: () => void;
 }
@@ -46,10 +47,11 @@ const RULES: SwipeRule[] = [
 
 export default function OnboardingScreen({
   nickname,
+  starting,
   onNickname,
   onStart,
 }: OnboardingScreenProps) {
-  const ready = !!nickname.trim();
+  const ready = !!nickname.trim() && !starting;
 
   return (
     <div
@@ -254,7 +256,7 @@ export default function OnboardingScreen({
           e.currentTarget.style.transform = "none";
         }}
       >
-        시작하기
+        {starting ? "불러오는 중…" : "시작하기"}
       </button>
     </div>
   );
