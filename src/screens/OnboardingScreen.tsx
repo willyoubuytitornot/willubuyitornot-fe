@@ -1,5 +1,6 @@
 interface OnboardingScreenProps {
   nickname: string;
+  starting: boolean;
   onNickname: (value: string) => void;
   onStart: () => void;
 }
@@ -46,10 +47,11 @@ const RULES: SwipeRule[] = [
 
 export default function OnboardingScreen({
   nickname,
+  starting,
   onNickname,
   onStart,
 }: OnboardingScreenProps) {
-  const ready = !!nickname.trim();
+  const ready = !!nickname.trim() && !starting;
 
   return (
     <div
@@ -82,26 +84,11 @@ export default function OnboardingScreen({
               width: 76,
               height: 76,
               borderRadius: 22,
-              background: "linear-gradient(150deg, var(--ac), var(--ac2))",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              background: "url(/assets/logo.png) center / cover no-repeat",
               boxShadow: "0 16px 40px -12px var(--ac)",
               animation: "gs-float 5s ease-in-out infinite",
             }}
-          >
-            <span
-              className="font-grotesk"
-              style={{
-                fontWeight: 700,
-                fontSize: 34,
-                color: "#0a0c11",
-                letterSpacing: -1,
-              }}
-            >
-              GS
-            </span>
-          </div>
+          />
           <div>
             <h1
               style={{
@@ -113,7 +100,7 @@ export default function OnboardingScreen({
                 lineHeight: 1.1,
               }}
             >
-              게임 스와이프
+              살겨말겨
             </h1>
             <p
               style={{
@@ -254,7 +241,7 @@ export default function OnboardingScreen({
           e.currentTarget.style.transform = "none";
         }}
       >
-        시작하기
+        {starting ? "불러오는 중…" : "시작하기"}
       </button>
     </div>
   );

@@ -1,10 +1,9 @@
 import GameCard from "../../components/GameCard";
-import GameInfoPanel from "../../components/GameInfoPanel";
 import SwipeControls from "../../components/SwipeControls";
-import { GAMES } from "../../data/games";
-import type { CardArt, Choice } from "../../types";
+import type { CardArt, Choice, Game } from "../../types";
 
 interface SwipeDesktopProps {
+  deck: Game[];
   index: number;
   flyingId: string | null;
   flyingDir: Choice | null;
@@ -14,6 +13,7 @@ interface SwipeDesktopProps {
 }
 
 export default function SwipeDesktop({
+  deck,
   index,
   flyingId,
   flyingDir,
@@ -21,9 +21,8 @@ export default function SwipeDesktop({
   showAiHint,
   onDecide,
 }: SwipeDesktopProps) {
-  const total = GAMES.length;
-  const visibleCards = GAMES.slice(index, index + 3);
-  const topGame = GAMES[index];
+  const total = deck.length;
+  const visibleCards = deck.slice(index, index + 3);
   const progressLabel = `${Math.min(index + 1, total)} / ${total}`;
   const progressPct = `${Math.round((index / total) * 100)}%`;
 
@@ -37,17 +36,8 @@ export default function SwipeDesktop({
         padding: "28px 48px",
       }}
     >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 1080,
-          display: "grid",
-          gridTemplateColumns: "432px 1fr",
-          gap: 52,
-          alignItems: "center",
-        }}
-      >
-        {/* left: stack + controls */}
+      <div style={{ width: "100%", maxWidth: 432 }}>
+        {/* stack + controls */}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ marginBottom: 14 }}>
             <div
@@ -101,18 +91,6 @@ export default function SwipeDesktop({
           </div>
 
           <SwipeControls onDecide={onDecide} style={{ marginTop: 20 }} />
-        </div>
-
-        {/* right: persistent AI info */}
-        <div
-          style={{
-            alignSelf: "stretch",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          {topGame && <GameInfoPanel game={topGame} cardArt={cardArt} />}
         </div>
       </div>
     </div>

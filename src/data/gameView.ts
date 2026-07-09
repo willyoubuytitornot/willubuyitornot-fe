@@ -1,6 +1,6 @@
 import { GENRES } from "./games";
 import { artBg, glyphOf, sentColor, showGlyph } from "./visuals";
-import type { CardArt, Game } from "../types";
+import type { CardArt, Game, GameInsight } from "../types";
 
 export interface SentimentView {
   label: string;
@@ -9,7 +9,7 @@ export interface SentimentView {
   color: string;
 }
 
-export interface GameView extends Game {
+export interface GameView extends Game, GameInsight {
   artBg: string;
   glyph: string;
   hasGlyph: boolean;
@@ -21,19 +21,25 @@ export interface GameView extends Game {
   sentimentsView: SentimentView[];
 }
 
-/** Enrich a game with all the derived display fields used across screens. */
-export function enrichGame(game: Game, cardArt: CardArt): GameView {
+/** Merge a game's card data with its fetched insight into the derived display
+ *  fields used by the detail views. */
+export function enrichGame(
+  game: Game,
+  insight: GameInsight,
+  cardArt: CardArt,
+): GameView {
   return {
     ...game,
+    ...insight,
     artBg: artBg(game.genre, cardArt),
     glyph: glyphOf(game.genre),
     hasGlyph: showGlyph(cardArt),
     gtag: GENRES[game.genre].tag,
-    ratingStr: game.rating.toFixed(1),
-    reviewsStr: game.reviews.toLocaleString(),
-    negative: 100 - game.positive,
-    posWidth: `${game.positive}%`,
-    sentimentsView: game.sentiments.map((s) => ({
+    ratingStr: insight.rating.toFixed(1),
+    reviewsStr: insight.reviews.toLocaleString(),
+    negative: 100 - insight.positive,
+    posWidth: `${insight.positive}%`,
+    sentimentsView: insight.sentiments.map((s) => ({
       label: s.label,
       pct: s.pct,
       width: `${s.pct}%`,

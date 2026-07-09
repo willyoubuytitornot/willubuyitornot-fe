@@ -1,14 +1,18 @@
-import { GENRES, GAMES } from "../../data/games";
+import { GENRES } from "../../data/games";
 import { artBg } from "../../data/visuals";
-import type { CardArt } from "../../types";
+import type { CardArt, GenreKey } from "../../types";
 import ArtImage from "../../components/ArtImage";
 
 interface OnboardingDesktopProps {
   nickname: string;
+  starting: boolean;
   cardArt: CardArt;
   onNickname: (value: string) => void;
   onStart: () => void;
 }
+
+// Decorative genre thumbnails for the onboarding form card.
+const SAMPLE_GENRES: GenreKey[] = ["RPG", "Action", "Racing"];
 
 const FEATURES = [
   {
@@ -39,12 +43,12 @@ const FEATURES = [
 
 export default function OnboardingDesktop({
   nickname,
+  starting,
   cardArt,
   onNickname,
   onStart,
 }: OnboardingDesktopProps) {
-  const ready = !!nickname.trim();
-  const sampleCards = GAMES.slice(0, 3);
+  const ready = !!nickname.trim() && !starting;
 
   return (
     <div
@@ -167,19 +171,19 @@ export default function OnboardingDesktop({
           }}
         >
           <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
-            {sampleCards.map((g) => (
+            {SAMPLE_GENRES.map((genre) => (
               <div
-                key={g.id}
+                key={genre}
                 style={{
                   flex: 1,
                   height: 84,
                   borderRadius: 12,
                   position: "relative",
                   overflow: "hidden",
-                  background: artBg(g.genre, cardArt),
+                  background: artBg(genre, cardArt),
                 }}
               >
-                <ArtImage genre={g.genre} />
+                <ArtImage genre={genre} />
                 <span
                   style={{
                     position: "absolute",
@@ -187,10 +191,10 @@ export default function OnboardingDesktop({
                     left: 8,
                     fontSize: 10,
                     fontWeight: 700,
-                    color: GENRES[g.genre].tag,
+                    color: GENRES[genre].tag,
                   }}
                 >
-                  {g.genre}
+                  {genre}
                 </span>
               </div>
             ))}
@@ -267,7 +271,7 @@ export default function OnboardingDesktop({
               e.currentTarget.style.transform = "none";
             }}
           >
-            시작하기
+            {starting ? "불러오는 중…" : "시작하기"}
           </button>
         </div>
       </div>

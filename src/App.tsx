@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import ResumeDialog from "./components/ResumeDialog";
 import { ACCENT_PAIRS, AI_GLOW } from "./data/games";
 import { useGameSwipe } from "./hooks/useGameSwipe";
 import { useIsDesktop } from "./hooks/useViewport";
@@ -45,6 +46,13 @@ export default function App() {
       ) : (
         <MobileLayout {...layoutProps} />
       )}
+      <ResumeDialog
+        open={state.resumePrompt}
+        compact={!isDesktop}
+        nickname={state.nickname}
+        onConfirm={actions.resumeResult}
+        onDismiss={actions.dismissResume}
+      />
     </div>
   );
 }

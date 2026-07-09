@@ -1,28 +1,35 @@
 import AiBadge from "../../components/AiBadge";
 import ArtImage from "../../components/ArtImage";
 import CommunityAnalysis from "../../components/CommunityAnalysis";
+import InsightLoading from "../../components/InsightLoading";
+import { GENRES } from "../../data/games";
 import { enrichGame } from "../../data/gameView";
-import type { CardArt, Game } from "../../types";
+import { artBg, glyphOf, showGlyph } from "../../data/visuals";
+import type { CardArt, Game, GameInsight } from "../../types";
 
 interface DetailModalProps {
   active: boolean;
   game: Game | null;
+  insight: GameInsight | null;
+  loading: boolean;
   cardArt: CardArt;
   onBack: () => void;
-  onStore: () => void;
-  onCommunity: () => void;
+  onStore: (url?: string) => void;
+  onCommunity: (url?: string) => void;
 }
 
 /** Desktop detail as a centered modal over a blurred backdrop. */
 export default function DetailModal({
   active,
   game,
+  insight,
+  loading,
   cardArt,
   onBack,
   onStore,
   onCommunity,
 }: DetailModalProps) {
-  const view = game ? enrichGame(game, cardArt) : null;
+  const view = game && insight ? enrichGame(game, insight, cardArt) : null;
 
   return (
     <div
@@ -42,7 +49,7 @@ export default function DetailModal({
         zIndex: 50,
       }}
     >
-      {view && (
+      {game && (
         <div
           style={{
             width: "100%",
@@ -63,12 +70,12 @@ export default function DetailModal({
           <div
             style={{
               position: "relative",
-              background: view.artBg,
+              background: artBg(game.genre, cardArt),
               minHeight: 460,
             }}
           >
-            <ArtImage genre={view.genre} />
-            {view.hasGlyph && (
+            <ArtImage genre={game.genre} src={game.imageUrl} />
+            {showGlyph(cardArt) && (
               <span
                 className="font-grotesk"
                 style={{
@@ -82,7 +89,7 @@ export default function DetailModal({
                   letterSpacing: -10,
                 }}
               >
-                {view.glyph}
+                {glyphOf(game.genre)}
               </span>
             )}
             <div
@@ -123,10 +130,10 @@ export default function DetailModal({
                     backdropFilter: "blur(6px)",
                     fontSize: 11,
                     fontWeight: 700,
-                    color: view.gtag,
+                    color: GENRES[game.genre].tag,
                   }}
                 >
-                  {view.genre}
+                  {game.genre}
                 </span>
                 <span
                   className="font-grotesk"
@@ -140,22 +147,24 @@ export default function DetailModal({
                     color: "#e6e9ef",
                   }}
                 >
-                  {view.year}
+                  {game.year}
                 </span>
-                <span
-                  className="font-grotesk"
-                  style={{
-                    padding: "5px 11px",
-                    borderRadius: 8,
-                    background: "rgba(10,12,17,.55)",
-                    backdropFilter: "blur(6px)",
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "#ffd25e",
-                  }}
-                >
-                  ★ {view.ratingStr}
-                </span>
+                {insight && (
+                  <span
+                    className="font-grotesk"
+                    style={{
+                      padding: "5px 11px",
+                      borderRadius: 8,
+                      background: "rgba(10,12,17,.55)",
+                      backdropFilter: "blur(6px)",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "#ffd25e",
+                    }}
+                  >
+                    ★ {insight.rating.toFixed(1)}
+                  </span>
+                )}
               </div>
               <h1
                 style={{
@@ -166,53 +175,63 @@ export default function DetailModal({
                   letterSpacing: "-.8px",
                 }}
               >
-                {view.title}
+                {game.title}
               </h1>
             </div>
           </div>
 
           {/* body */}
           <div style={{ padding: "32px 34px", overflowY: "auto" }}>
-            <p
-              style={{
-                margin: "0 0 20px",
-                fontSize: 14.5,
-                color: "#aab3c1",
-                lineHeight: 1.55,
-              }}
-            >
-              {view.desc}
-            </p>
-            <div
-              style={{
-                position: "relative",
-                borderRadius: 20,
-                padding: 1.5,
-                background:
-                  "linear-gradient(120deg, var(--ac), var(--aig), var(--ac))",
-                backgroundSize: "300% 100%",
-                animation: "gs-shimmer 6s linear infinite",
-                boxShadow: "0 0 40px -18px var(--aig)",
-              }}
-            >
-              <div
+            {game.desc && (
+              <p
                 style={{
-                  borderRadius: 19,
-                  background: "linear-gradient(160deg, #161b26, #11131a)",
-                  padding: 22,
+                  margin: "0 0 20px",
+                  fontSize: 14.5,
+                  color: "#aab3c1",
+                  lineHeight: 1.55,
                 }}
               >
-                <AiBadge
-                  label="AI 커뮤니티 요약"
-                  note={`리뷰 ${view.reviewsStr}개 기반`}
-                  noteMono
-                />
-                <CommunityAnalysis view={view} showSummary />
+                {game.desc}
+              </p>
+            )}
+            {(view || loading) && (
+              <div
+                style={{
+                  position: "relative",
+                  borderRadius: 20,
+                  padding: 1.5,
+                  background:
+                    "linear-gradient(120deg, var(--ac), var(--aig), var(--ac))",
+                  backgroundSize: "300% 100%",
+                  animation: "gs-shimmer 6s linear infinite",
+                  boxShadow: "0 0 40px -18px var(--aig)",
+                }}
+              >
+                <div
+                  style={{
+                    borderRadius: 19,
+                    background: "linear-gradient(160deg, #161b26, #11131a)",
+                    padding: 22,
+                  }}
+                >
+                  {view ? (
+                    <>
+                      <AiBadge
+                        label="AI 커뮤니티 요약"
+                        note={`리뷰 ${view.reviewsStr}개 기반`}
+                        noteMono
+                      />
+                      <CommunityAnalysis view={view} showSummary />
+                    </>
+                  ) : (
+                    <InsightLoading />
+                  )}
+                </div>
               </div>
-            </div>
+            )}
             <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
               <button
-                onClick={onStore}
+                onClick={() => onStore(game.storeUrl)}
                 style={{
                   flex: 1.4,
                   height: 54,
@@ -231,7 +250,7 @@ export default function DetailModal({
                 스토어에서 보기
               </button>
               <button
-                onClick={onCommunity}
+                onClick={() => onCommunity(game.communityUrl)}
                 style={{
                   flex: 1,
                   height: 54,

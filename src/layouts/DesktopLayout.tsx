@@ -74,6 +74,7 @@ export default function DesktopLayout({
         >
           <OnboardingDesktop
             nickname={state.nickname}
+            starting={state.starting}
             cardArt={cardArt}
             onNickname={actions.setNickname}
             onStart={actions.start}
@@ -82,6 +83,7 @@ export default function DesktopLayout({
 
         <ScreenLayer active={state.screen === "swipe"} label="스와이프(데스크탑)">
           <SwipeDesktop
+            deck={state.deck}
             index={state.index}
             flyingId={state.flyingId}
             flyingDir={state.flyingDir}
@@ -97,7 +99,8 @@ export default function DesktopLayout({
           scroll
         >
           <ResultDesktop
-            decisions={state.decisions}
+            result={state.result}
+            totalCount={state.result?.totalCount ?? state.decisions.length}
             nickname={state.nickname}
             personaReady={state.personaReady}
             personaStep={state.personaStep}
@@ -109,10 +112,20 @@ export default function DesktopLayout({
         <DetailModal
           active={state.screen === "detail"}
           game={state.selected}
+          insight={state.insight}
+          loading={state.loadingDetail}
           cardArt={cardArt}
           onBack={actions.back}
-          onStore={() => actions.showToast("STOVE 스토어로 이동합니다")}
-          onCommunity={() => actions.showToast("커뮤니티로 이동합니다")}
+          onStore={(url) =>
+            url
+              ? window.open(url, "_blank", "noopener,noreferrer")
+              : actions.showToast("스토어 링크가 없어요")
+          }
+          onCommunity={(url) =>
+            url
+              ? window.open(url, "_blank", "noopener,noreferrer")
+              : actions.showToast("커뮤니티 링크가 없어요")
+          }
         />
       </div>
 

@@ -28,15 +28,23 @@ export interface Sentiment {
   pct: number;
 }
 
+/** Card-level game fields (from GET /v1/swipes/current → games[]). */
 export interface Game {
   id: string;
   title: string;
   genre: GenreKey;
   year: string;
-  rating: number;
   desc: string;
   /** AI one-liner shown on the swipe card */
   ai: string;
+  imageUrl?: string;
+  storeUrl?: string;
+  communityUrl?: string;
+}
+
+/** Review-level fields, fetched on demand from GET /v1/games/{id}/insight. */
+export interface GameInsight {
+  rating: number;
   reviews: number;
   /** percentage of positive reviews (0-100) */
   positive: number;

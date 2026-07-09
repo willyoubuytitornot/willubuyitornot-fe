@@ -1,15 +1,14 @@
-import { enrichGame } from "../data/gameView";
-import type { CardArt, Game } from "../types";
-import CommunityAnalysis from "./CommunityAnalysis";
+import { GENRES } from "../data/games";
+import type { Game } from "../types";
 
 interface GameInfoPanelProps {
   game: Game;
-  cardArt: CardArt;
 }
 
-/** Persistent AI info panel shown beside the card stack on desktop. */
-export default function GameInfoPanel({ game, cardArt }: GameInfoPanelProps) {
-  const view = enrichGame(game, cardArt);
+/** Persistent info panel beside the card stack on desktop. Shows card-level
+ *  data + the AI one-liner; review insight is fetched only in the detail view. */
+export default function GameInfoPanel({ game }: GameInfoPanelProps) {
+  const gtag = GENRES[game.genre].tag;
 
   const chip = {
     padding: "6px 12px",
@@ -29,14 +28,11 @@ export default function GameInfoPanel({ game, cardArt }: GameInfoPanelProps) {
       }}
     >
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-        <span style={{ ...chip, fontWeight: 700, color: view.gtag }}>
-          {view.genre}
+        <span style={{ ...chip, fontWeight: 700, color: gtag }}>
+          {game.genre}
         </span>
         <span className="font-grotesk" style={{ ...chip, color: "#e6e9ef" }}>
-          {view.year}
-        </span>
-        <span className="font-grotesk" style={{ ...chip, color: "#ffd25e" }}>
-          ★ {view.ratingStr}
+          {game.year}
         </span>
       </div>
       <h2
@@ -48,18 +44,20 @@ export default function GameInfoPanel({ game, cardArt }: GameInfoPanelProps) {
           letterSpacing: "-.8px",
         }}
       >
-        {view.title}
+        {game.title}
       </h2>
-      <p
-        style={{
-          margin: "11px 0 0",
-          fontSize: 14.5,
-          color: "#aab3c1",
-          lineHeight: 1.55,
-        }}
-      >
-        {view.desc}
-      </p>
+      {game.desc && (
+        <p
+          style={{
+            margin: "11px 0 0",
+            fontSize: 14.5,
+            color: "#aab3c1",
+            lineHeight: 1.55,
+          }}
+        >
+          {game.desc}
+        </p>
+      )}
 
       {/* AI one-liner */}
       <div
@@ -115,37 +113,8 @@ export default function GameInfoPanel({ game, cardArt }: GameInfoPanelProps) {
             fontWeight: 500,
           }}
         >
-          {view.ai}
+          {game.ai}
         </p>
-      </div>
-
-      {/* community analysis */}
-      <div
-        style={{
-          marginTop: 22,
-          paddingTop: 22,
-          borderTop: "1px solid rgba(255,255,255,.07)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 13,
-          }}
-        >
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#eef1f6" }}>
-            AI 커뮤니티 분석
-          </span>
-          <span
-            className="font-grotesk"
-            style={{ fontSize: 11, color: "#6b7280" }}
-          >
-            리뷰 {view.reviewsStr}개 기반
-          </span>
-        </div>
-        <CommunityAnalysis view={view} />
       </div>
     </div>
   );
