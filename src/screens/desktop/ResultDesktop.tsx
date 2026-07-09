@@ -283,7 +283,7 @@ export default function ResultDesktop({
               </span>
             </div>
 
-            {!result || !personaReady ? (
+            {!result || !personaReady || !result.persona.title ? (
               <PersonaLoadingDesktop message={personaMsg} />
             ) : (
               <div style={{ animation: "gs-reveal .5s cubic-bezier(.2,.8,.2,1)" }}>
@@ -340,6 +340,7 @@ export default function ResultDesktop({
         </div>
 
         {/* preference analysis */}
+        {result && (
         <div
           style={{
             background: "#14171f",
@@ -348,6 +349,8 @@ export default function ResultDesktop({
             padding: 26,
           }}
         >
+          {result && result.genreStats.length > 0 && (
+          <>
           <div
             style={{ fontSize: 16, fontWeight: 700, color: "#eef1f6", marginBottom: 4 }}
           >
@@ -399,6 +402,8 @@ export default function ResultDesktop({
               </div>
             ))}
           </div>
+          </>
+          )}
           <div style={{ display: "flex", gap: 8, marginTop: 20 }}>
             {stats.map((s) => (
               <div
@@ -424,6 +429,7 @@ export default function ResultDesktop({
             ))}
           </div>
         </div>
+        )}
       </div>
 
       {/* game lists by decision */}

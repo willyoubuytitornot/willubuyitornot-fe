@@ -109,6 +109,36 @@ export function toGenreStat(dto: GenreStatDto): GenreStat {
   };
 }
 
+function resolveDeck(ids: string[], deck: Game[]): Game[] {
+  const byId = new Map(deck.map((g) => [g.id, g]));
+  return (ids ?? [])
+    .map((id) => byId.get(id))
+    .filter((g): g is Game => Boolean(g));
+}
+
+/** Lists + counts from this user's decisions alone — available before the
+ *  (slower, AI-generated) report resolves, so the result screen can paint early.
+ *  genreStats/persona stay empty until buildResult fills them in. */
+export function buildPartialResult(
+  userSwipe: UserSwipeResponse,
+  deck: Game[],
+): ResultData {
+  const buy = userSwipe.buy ?? [];
+  const skip = userSwipe.skip ?? [];
+  const maybe = userSwipe.maybe ?? [];
+  return {
+    liked: resolveDeck(buy, deck),
+    maybe: resolveDeck(maybe, deck),
+    passed: resolveDeck(skip, deck),
+    likeCount: buy.length,
+    maybeCount: maybe.length,
+    passCount: skip.length,
+    totalCount: buy.length + skip.length + maybe.length,
+    genreStats: [],
+    persona: { title: "", desc: "", tags: [] },
+  };
+}
+
 /** Combine the AI report + this user's decisions (resolved on the deck) into
  *  the result-screen model. */
 export function buildResult(
@@ -116,16 +146,10 @@ export function buildResult(
   userSwipe: UserSwipeResponse,
   deck: Game[],
 ): ResultData {
-  const byId = new Map(deck.map((g) => [g.id, g]));
-  const resolve = (ids: string[]): Game[] =>
-    (ids ?? [])
-      .map((id) => byId.get(id))
-      .filter((g): g is Game => Boolean(g));
-
   return {
-    liked: resolve(userSwipe.buy),
-    maybe: resolve(userSwipe.maybe),
-    passed: resolve(userSwipe.skip),
+    liked: resolveDeck(userSwipe.buy, deck),
+    maybe: resolveDeck(userSwipe.maybe, deck),
+    passed: resolveDeck(userSwipe.skip, deck),
     likeCount: report.buyCount,
     maybeCount: report.maybeCount,
     passCount: report.skipCount,

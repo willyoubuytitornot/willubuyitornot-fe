@@ -69,7 +69,7 @@ export default function MobileLayout({
         <ScreenLayer active={state.screen === "result"} label="결과" scroll>
           <ResultScreen
             result={state.result}
-            totalCount={state.decisions.length}
+            totalCount={state.result?.totalCount ?? state.decisions.length}
             nickname={state.nickname}
             personaReady={state.personaReady}
             personaStep={state.personaStep}

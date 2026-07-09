@@ -11,6 +11,7 @@ import {
   saveVotes,
 } from "../api/endpoints";
 import {
+  buildPartialResult,
   buildResult,
   toDecisionValue,
   toGame,
@@ -43,6 +44,8 @@ export interface GameSwipeState {
   flyingDir: Choice | null;
   personaReady: boolean;
   personaStep: number;
+  // Show the "resume your previous round?" dialog on entry.
+  resumePrompt: boolean;
   // API-backed state
   userId: string | null;
   swipeId: string | null;
@@ -65,6 +68,7 @@ export function useGameSwipe() {
     flyingDir: null,
     personaReady: false,
     personaStep: 0,
+    resumePrompt: false,
     userId: null,
     swipeId: null,
     deck: [],
@@ -91,8 +95,8 @@ export function useGameSwipe() {
     }, TOAST_MS);
   }, []);
 
-  // Restore a prior session: prefill the nickname and reload the saved round so
-  // start() can resume it (wires GET /users/{id} + GET /swipes/{id}).
+  // Restore a prior session: reload the saved round and, if one exists, offer to
+  // jump to its result via the resume dialog (wires GET /users/{id} + /swipes/{id}).
   useEffect(() => {
     const userId = localStorage.getItem(LS_USER);
     const swipeId = localStorage.getItem(LS_SWIPE);
@@ -109,6 +113,7 @@ export function useGameSwipe() {
           nickname: s.nickname || user.nickname,
           swipeId: swipe ? swipe.id : s.swipeId,
           deck: swipe ? swipe.games.map(toGame) : s.deck,
+          resumePrompt: Boolean(swipe),
         }));
       } catch {
         // stale session — clear and fall back to a fresh onboarding
@@ -193,10 +198,11 @@ export function useGameSwipe() {
           decision: toDecisionValue(d.choice),
         }));
         await saveVotes(userId, swipeId, votes);
-        const [report, userSwipe] = await Promise.all([
-          getReport(userId, swipeId),
-          getUserSwipe(userId, swipeId),
-        ]);
+        // Paint the lists/counts from the fast userSwipe first, then fill in the
+        // slower AI report (persona + genre stats) when it resolves.
+        const userSwipe = await getUserSwipe(userId, swipeId);
+        setState((s) => ({ ...s, result: buildPartialResult(userSwipe, deck) }));
+        const report = await getReport(userId, swipeId);
         setState((s) => ({ ...s, result: buildResult(report, userSwipe, deck) }));
       } catch (e) {
         showToast(errMsg(e));
@@ -246,6 +252,53 @@ export function useGameSwipe() {
       showToast(errMsg(e));
     }
   }, [showToast]);
+
+  // Resume dialog — "확인": jump to the result screen immediately (persona
+  // "thinking" animation covers the wait), then fill in the loaded report.
+  const resumeResult = useCallback(async () => {
+    const { userId, swipeId, deck } = stateRef.current;
+    if (!userId || !swipeId) {
+      setState((s) => ({ ...s, resumePrompt: false }));
+      return;
+    }
+    submittedRef.current = true; // we own this fetch; skip the vote-submit effect
+    startPersonaLoad();
+    setState((s) => ({ ...s, resumePrompt: false, result: null, screen: "result" }));
+    try {
+      const userSwipe = await getUserSwipe(userId, swipeId);
+      setState((s) => ({ ...s, result: buildPartialResult(userSwipe, deck) }));
+      const report = await getReport(userId, swipeId);
+      setState((s) => ({ ...s, result: buildResult(report, userSwipe, deck) }));
+    } catch (e) {
+      // No completed round after all — resume the swipe deck instead.
+      submittedRef.current = false;
+      setState((s) => ({
+        ...s,
+        screen: "swipe",
+        index: 0,
+        decisions: [],
+        result: null,
+      }));
+      showToast(errMsg(e));
+    }
+  }, [showToast, startPersonaLoad]);
+
+  // Resume dialog — "다시할래요": drop the session and start fresh from onboarding.
+  const dismissResume = useCallback(() => {
+    localStorage.removeItem(LS_USER);
+    localStorage.removeItem(LS_SWIPE);
+    setState((s) => ({
+      ...s,
+      resumePrompt: false,
+      nickname: "",
+      userId: null,
+      swipeId: null,
+      deck: [],
+      index: 0,
+      decisions: [],
+      result: null,
+    }));
+  }, []);
 
   // Open the detail view, fetching the freshest game data + its AI insight.
   const openDetail = useCallback(
@@ -327,6 +380,8 @@ export function useGameSwipe() {
       decide,
       setNickname,
       start,
+      resumeResult,
+      dismissResume,
       openDetail,
       back,
       goHome,

@@ -100,7 +100,7 @@ export default function DesktopLayout({
         >
           <ResultDesktop
             result={state.result}
-            totalCount={state.decisions.length}
+            totalCount={state.result?.totalCount ?? state.decisions.length}
             nickname={state.nickname}
             personaReady={state.personaReady}
             personaStep={state.personaStep}

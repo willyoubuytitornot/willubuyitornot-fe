@@ -325,7 +325,7 @@ export default function ResultScreen({
             </span>
           </div>
 
-          {!result || !personaReady ? (
+          {!result || !personaReady || !result.persona.title ? (
             <PersonaLoading message={personaMsg} />
           ) : (
             <div style={{ animation: "gs-reveal .5s cubic-bezier(.2,.8,.2,1)" }}>
@@ -392,6 +392,8 @@ export default function ResultScreen({
           marginBottom: 16,
         }}
       >
+        {result.genreStats.length > 0 && (
+        <>
         <div
           style={{
             fontSize: 15,
@@ -450,6 +452,8 @@ export default function ResultScreen({
             </div>
           ))}
         </div>
+        </>
+        )}
         <div style={{ display: "flex", gap: 8, marginTop: 18 }}>
           {[
             { value: result.likeCount, label: "좋아요", color: "#3fe08a", bg: "rgba(63,224,138,.1)" },

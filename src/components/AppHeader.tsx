@@ -52,31 +52,19 @@ export default function AppHeader({
             cursor: onHome ? "pointer" : "default",
           }}
         >
-          <div
+          <img
+            src="/assets/logo.png"
+            alt="살겨말겨"
             style={{
               width: compact ? 32 : 38,
               height: compact ? 32 : 38,
-              borderRadius: compact ? 9 : 11,
+              borderRadius: 11,
               flexShrink: 0,
-              background: "linear-gradient(150deg, var(--ac), var(--ac2))",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              objectFit: "cover",
+              display: "block",
               boxShadow: "0 8px 22px -8px var(--ac)",
             }}
-          >
-            <span
-              className="font-grotesk"
-              style={{
-                fontWeight: 700,
-                fontSize: compact ? 15 : 17,
-                color: "#0a0c11",
-                letterSpacing: "-.5px",
-              }}
-            >
-              GS
-            </span>
-          </div>
+          />
           <span
             style={{
               fontSize: compact ? 15 : 16,
@@ -86,7 +74,7 @@ export default function AppHeader({
               whiteSpace: "nowrap",
             }}
           >
-            게임 스와이프
+            살겨말겨
           </span>
         </button>
         <span
